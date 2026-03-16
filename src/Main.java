@@ -1,100 +1,101 @@
 import java.util.*;
 
-// Add-On Service class
-class AddOnService {
-    private String serviceName;
-    private double serviceCost;
+// Reservation class
+class Reservation {
+    private String reservationId;
+    private String guestName;
+    private String roomType;
+    private int nights;
 
-    public AddOnService(String serviceName, double serviceCost) {
-        this.serviceName = serviceName;
-        this.serviceCost = serviceCost;
+    public Reservation(String reservationId, String guestName, String roomType, int nights) {
+        this.reservationId = reservationId;
+        this.guestName = guestName;
+        this.roomType = roomType;
+        this.nights = nights;
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public String getReservationId() {
+        return reservationId;
     }
 
-    public double getServiceCost() {
-        return serviceCost;
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public String getRoomType() {
+        return roomType;
+    }
+
+    public int getNights() {
+        return nights;
     }
 
     @Override
     public String toString() {
-        return serviceName + " (₹" + serviceCost + ")";
+        return "Reservation ID: " + reservationId +
+                ", Guest: " + guestName +
+                ", Room Type: " + roomType +
+                ", Nights: " + nights;
     }
 }
 
-// Add-On Service Manager
-class AddOnServiceManager {
+// Booking History class
+class BookingHistory {
 
-    // Map<ReservationID, List of Services>
-    private Map<String, List<AddOnService>> reservationServices = new HashMap<>();
+    // List to maintain confirmed reservations
+    private List<Reservation> reservations = new ArrayList<>();
 
-    // Add service to reservation
-    public void addService(String reservationId, AddOnService service) {
-        reservationServices
-                .computeIfAbsent(reservationId, k -> new ArrayList<>())
-                .add(service);
-
-        System.out.println(service.getServiceName() + " added to reservation " + reservationId);
+    // Add confirmed booking
+    public void addReservation(Reservation reservation) {
+        reservations.add(reservation);
+        System.out.println("Reservation " + reservation.getReservationId() + " added to booking history.");
     }
 
-    // Display services for reservation
-    public void displayServices(String reservationId) {
-        List<AddOnService> services = reservationServices.get(reservationId);
+    // Retrieve reservations
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+}
 
-        if (services == null || services.isEmpty()) {
-            System.out.println("No add-on services for reservation " + reservationId);
+// Booking Report Service
+class BookingReportService {
+
+    public void generateReport(List<Reservation> reservations) {
+
+        System.out.println("\n===== BOOKING HISTORY REPORT =====");
+
+        if (reservations.isEmpty()) {
+            System.out.println("No bookings found.");
             return;
         }
 
-        System.out.println("\nAdd-On Services for Reservation " + reservationId + ":");
-        for (AddOnService service : services) {
-            System.out.println("- " + service);
-        }
-    }
-
-    // Calculate total cost
-    public double calculateTotalCost(String reservationId) {
-        List<AddOnService> services = reservationServices.get(reservationId);
-        double total = 0;
-
-        if (services != null) {
-            for (AddOnService service : services) {
-                total += service.getServiceCost();
-            }
+        for (Reservation r : reservations) {
+            System.out.println(r);
         }
 
-        return total;
+        System.out.println("\nTotal Bookings: " + reservations.size());
     }
 }
 
 // Main class
-public class UseCase7AddOnServiceSelection {
+public class UseCase8BookingHistoryReport {
 
     public static void main(String[] args) {
 
-        AddOnServiceManager manager = new AddOnServiceManager();
+        BookingHistory history = new BookingHistory();
+        BookingReportService reportService = new BookingReportService();
 
-        String reservationId = "RES101";
+        // Simulating confirmed bookings
+        Reservation r1 = new Reservation("RES101", "Alice", "Deluxe", 2);
+        Reservation r2 = new Reservation("RES102", "Bob", "Suite", 3);
+        Reservation r3 = new Reservation("RES103", "Charlie", "Standard", 1);
 
-        // Guest selects services
-        AddOnService breakfast = new AddOnService("Breakfast", 500);
-        AddOnService airportPickup = new AddOnService("Airport Pickup", 1200);
-        AddOnService spa = new AddOnService("Spa Service", 2000);
+        // Add bookings to history
+        history.addReservation(r1);
+        history.addReservation(r2);
+        history.addReservation(r3);
 
-        manager.addService(reservationId, breakfast);
-        manager.addService(reservationId, airportPickup);
-        manager.addService(reservationId, spa);
-
-        // Display selected services
-        manager.displayServices(reservationId);
-
-        // Calculate additional cost
-        double totalCost = manager.calculateTotalCost(reservationId);
-
-        System.out.println("\nTotal Additional Cost: ₹" + totalCost);
-
-        System.out.println("\nNote: Core booking and inventory remain unchanged.");
+        // Admin requests report
+        reportService.generateReport(history.getReservations());
     }
 }
